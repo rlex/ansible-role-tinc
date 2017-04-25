@@ -1,0 +1,8 @@
+tinc_mode: 'router'
+tinc_devicetype: 'tap'
+tinc_cipher: 'aes-256-cbc'
+tinc_digest: 'SHA512'
+tinc_compression: '10'
+tinc_addressfamily: 'ipv4'
+tinc_iffonequeue: 'no'
+tinc_tcponly: 'no'

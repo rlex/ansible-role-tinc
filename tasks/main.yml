@@ -1,0 +1,5 @@
+- include: install.yml
+  when: (tinc_vpn is defined and tinc_vpn == 'present')
+
+- include: remove.yml
+  when: (tinc_vpn is defined and tinc_vpn == 'absent')

@@ -1,0 +1,122 @@
+---
+
+- name: install epel-release (redhat)
+  yum:
+    name: epel-release
+    state: latest
+  when: (ansible_os_family == "RedHat" and ansible_distribution_major_version == "7")
+
+- name: install tinc
+  package:
+    name: tinc
+    state: latest
+
+- name: create tinc systemd service file (redhat)
+  template:
+    src: tinc.service.j2
+    dest: /etc/systemd/system/tinc.service
+  register: tinc_service_file
+  when: (ansible_os_family == "RedHat" and ansible_distribution_major_version == "7")
+
+- name: systemctl daemon-reload (redhat)
+  shell: systemctl daemon-reload
+  when: tinc_service_file.changed
+
+- name: ensure tinc tinc_netname directory exists
+  file:
+    path: "/etc/tinc/{{ tinc_netname }}/hosts"
+    recurse: True
+    state: directory
+
+- name: create /etc/tinc/nets.boot file from template
+  template:
+    src: nets.boot.j2
+    dest: /etc/tinc/nets.boot
+  notify:
+    - restart tinc
+
+- name: ensure tinc.conf contains connection to all other nodes
+  template:
+    src: tinc.conf.j2
+    dest: "/etc/tinc/{{ tinc_netname }}/tinc.conf"
+  notify:
+    - reload tinc
+
+- name: create tinc-up file
+  template:
+    src: tinc-up.j2
+    dest: "/etc/tinc/{{ tinc_netname }}/tinc-up"
+    mode: 0755
+  notify:
+    - restart tinc
+
+- name: create tinc-down file
+  template:
+    src: tinc-down.j2
+    dest: "/etc/tinc/{{ tinc_netname }}/tinc-down"
+    mode: 0755
+  notify:
+    - restart tinc
+
+- name: get my public IP
+  ipify_facts: api_url=http://api.ipify.org
+
+- name: ensure tinc hosts file binds to physical ip address
+  lineinfile:
+    dest: "/etc/tinc/{{ tinc_netname }}/hosts/{{ tinc_vpn_hostname }}"
+    line: "Address = {{ tinc_physical_ip }}"
+    regexp: "Address = \\d+.\\d+.\\d+.\\d+"
+    create: yes
+  notify:
+    - restart tinc
+
+- name: ensure subnet ip address is properly set in tinc host file
+  lineinfile:
+    dest: "/etc/tinc/{{ tinc_netname }}/hosts/{{ tinc_vpn_hostname }}"
+    line: "Subnet = {{ tinc_vpn_ip }}/{{ tinc_vpn_subnet_cidr_netmask }}"
+    create: yes
+  notify:
+    - restart tinc
+
+- name: check whether /etc/tinc/tinc_netname/hosts/tinc_vpn_hostname contains "-----END RSA PUBLIC KEY-----"
+  command: "awk '/^-----END RSA PUBLIC KEY-----$/'  /etc/tinc/{{ tinc_netname }}/hosts/{{ tinc_vpn_hostname }}"
+  changed_when: "public_key.stdout != '-----END RSA PUBLIC KEY-----'"
+  register: public_key
+
+# this is necessary because the public key will not be generated (non-interactively) if the private key already exists
+- name: delete private key and regenerate keypair if public key is absent from tinc hosts file
+  file:
+    path: "/etc/tinc/{{ tinc_netname }}/rsa_key.priv"
+    state: absent
+  when: public_key.changed
+
+- name: create tinc private key (and append public key to tincd hosts file)
+  shell: "tincd -n {{ tinc_netname }} -K4096"
+  args:
+    creates: "/etc/tinc/{{ tinc_netname }}/rsa_key.priv"
+  notify:
+    - restart tinc
+
+- name: fetch tinc hosts file after key creation
+  fetch:
+    src: "/etc/tinc/{{ tinc_netname }}/hosts/{{ tinc_vpn_hostname }}"
+    dest: "fetch/{{ tinc_vpn_hostname }}"
+    flat: yes
+  notify:
+    - reload tinc
+
+- name: sync the fetched tinc hosts files on each host
+  synchronize:
+    src: fetch/
+    dest: "/etc/tinc/{{ tinc_netname }}/hosts/"
+  notify:
+    - reload tinc
+
+- name: run handlers
+  meta: flush_handlers
+
+- name: ensure tinc is started
+  service:
+    name: tinc
+    enabled: yes
+    state: started
