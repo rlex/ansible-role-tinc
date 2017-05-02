@@ -109,6 +109,7 @@
   synchronize:
     src: fetch/
     dest: "/etc/tinc/{{ tinc_netname }}/hosts/"
+    delete: yes
   notify:
     - reload tinc
 
