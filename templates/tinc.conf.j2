@@ -8,6 +8,7 @@ Digest = {{ tinc_digest }}
 Compression = {{ tinc_compression }}
 IffOneQueue = {{ tinc_iffonequeue }}
 TCPOnly = {{ tinc_tcponly }}
+StrictSubnets = {{ tinc_strictsubnets }}
 {% for tinc_host in ansible_play_hosts %}
 {% if inventory_hostname != hostvars[tinc_host]['inventory_hostname']  %}
 {% if hostvars[tinc_host]['tinc_vpn_hostname'] is defined %}
