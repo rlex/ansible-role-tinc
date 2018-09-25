@@ -1,2 +1,3 @@
 #!/bin/sh
-ifconfig {{ tinc_vpn_interface }} {{ tinc_vpn_ip }} netmask {{ tinc_vpn_netmask }}
+ip link set {{ tinc_vpn_interface }} up
+ip address add {{ tinc_vpn_ip }}/{{ tinc_vpn_netmask }} dev {{ tinc_vpn_interface }}
