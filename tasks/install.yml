@@ -71,13 +71,23 @@
   notify:
     - restart tinc
 
-- name: ensure subnet ip address is properly set in tinc host file
+- name: ensure host ip address is properly set in tinc host file (router mode)
   lineinfile:
     dest: "/etc/tinc/{{ tinc_netname }}/hosts/{{ tinc_vpn_hostname }}"
     line: "Subnet = {{ tinc_vpn_ip }}/{{ tinc_vpn_subnet_cidr_netmask }}"
     create: yes
   notify:
     - restart tinc
+  when: tinc_mode == 'router'
+
+- name: ensure subnet is properly set in tinc host file (switch mode)
+  lineinfile:
+    dest: "/etc/tinc/{{ tinc_netname }}/hosts/{{ tinc_vpn_hostname }}"
+    line: "Subnet = {{ tinc_vpn_subnet }}"
+    create: yes
+  notify:
+    - restart tinc
+  when: tinc_mode == 'switch' and tinc_vpn_subnet is defined
 
 - name: check whether /etc/tinc/tinc_netname/hosts/tinc_vpn_hostname contains "-----END RSA PUBLIC KEY-----"
   command: "awk '/^-----END RSA PUBLIC KEY-----$/'  /etc/tinc/{{ tinc_netname }}/hosts/{{ tinc_vpn_hostname }}"
