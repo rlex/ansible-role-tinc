@@ -18,8 +18,9 @@
   register: tinc_service_file
   when: (ansible_os_family == "RedHat" and ansible_distribution_major_version == "7")
 
-- name: systemctl daemon-reload (redhat)
-  shell: systemctl daemon-reload
+- name: reload systemd
+  systemd:
+    daemon_reload: yes
   when: tinc_service_file.changed
 
 - name: ensure tinc tinc_netname directory exists
