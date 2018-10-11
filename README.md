@@ -2,6 +2,16 @@ initially fork of https://github.com/thisismitch/ansible-tinc, has been expanded
 
 Requires ansible >=2.2
 
+Example playbook:
+
+```
+- name: install and configure tinc mesh VPN
+  hosts: all
+  any_errors_fatal: true
+  roles:
+    - { role: tinc, tags: tinc }
+```
+
 Quickstart:
 in host_vars/some_server:
 ```
