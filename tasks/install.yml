@@ -21,7 +21,7 @@
 - name: ensure tinc tinc_netname directory exists
   file:
     path: "/etc/tinc/{{ tinc_netname }}/hosts"
-    recurse: True
+    recurse: true
     state: directory
 
 - name: create /etc/tinc/nets.boot file from template
