@@ -55,7 +55,9 @@
     - restart tinc
 
 - name: get my public IP
-  ipify_facts: api_url=http://api.ipify.org
+  ipify_facts:
+    api_url: http://api.ipify.org
+  when: tinc_physical_ip == ipify_public_ip
 
 - name: ensure tinc hosts file binds to physical ip address
   lineinfile:
