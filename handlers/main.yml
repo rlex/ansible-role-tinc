@@ -9,3 +9,7 @@
   service:
     name: tinc
     state: reloaded
+
+- name: reload systemd
+  systemd:
+    daemon_reload: yes
