@@ -1,0 +1,1 @@
+tinc_service_name: "tinc@{{ tinc_netname }}"

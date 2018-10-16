@@ -2,12 +2,12 @@
 
 - name: restart tinc
   service:
-    name: tinc
+    name: "{{ tinc_service_name }}"
     state: restarted
 
 - name: reload tinc
   service:
-    name: tinc
+    name: "{{ tinc_service_name }}"
     state: reloaded
 
 - name: reload systemd
