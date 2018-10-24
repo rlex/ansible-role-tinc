@@ -6,9 +6,11 @@
     state: latest
   when: (ansible_os_family == "RedHat")
 
-- name: install tinc
+- name: install tinc and dependencies
   package:
-    name: tinc
+    name:
+      - tinc
+      - rsync
     state: latest
 
 - name: create tinc systemd service file (redhat)
