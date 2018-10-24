@@ -7,3 +7,5 @@ tinc_addressfamily: 'ipv4'
 tinc_iffonequeue: 'no'
 tinc_tcponly: 'no'
 tinc_strictsubnets: 'no'
+tinc_physical_ip: '{{ ansible_default_ipv4["address"] }}'
+tinc_use_ipify: false

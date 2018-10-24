@@ -57,7 +57,7 @@
 - name: get my public IP
   ipify_facts:
     api_url: http://api.ipify.org
-  when: tinc_physical_ip == ipify_public_ip
+  when: tinc_use_ipify
 
 - name: ensure tinc hosts file binds to physical ip address
   lineinfile:
