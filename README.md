@@ -31,6 +31,8 @@ tinc_tcponly: 'yes'
 tinc_iffonequeue: 'yes'
 ```
 
+If you have multiple networks in same ansible root (multiple inventories sharing same playbooks / roles) make sure to use unique tinc_netname for each unique network. This is needed for proper key syncing.
+
 ##### Ipify
 If your server is behind NAT (not so rare case) you might need to get public ip from ipify.  
 In that case, default setting (ansible_default_ipv4["address"]) will return LAN ip  

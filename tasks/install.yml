@@ -110,14 +110,14 @@
 - name: fetch tinc hosts file after key creation
   fetch:
     src: "/etc/tinc/{{ tinc_netname }}/hosts/{{ tinc_vpn_hostname }}"
-    dest: "fetch/{{ tinc_vpn_hostname }}"
+    dest: "fetch/{{ tinc_netname }}/{{ tinc_vpn_hostname }}"
     flat: yes
   notify:
     - reload tinc
 
 - name: sync the fetched tinc hosts files on each host
   synchronize:
-    src: fetch/
+    src: fetch/{{ tinc_netname }}/
     dest: "/etc/tinc/{{ tinc_netname }}/hosts/"
     delete: yes
   notify:
