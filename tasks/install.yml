@@ -120,6 +120,7 @@
     src: fetch/{{ tinc_netname }}/
     dest: "/etc/tinc/{{ tinc_netname }}/hosts/"
     delete: yes
+    perms: no
   notify:
     - reload tinc
 
